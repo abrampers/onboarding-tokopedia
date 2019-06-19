@@ -105,12 +105,12 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     }
 }
 
-//extension SearchViewController: ASCollectionDataSource {
-//    public func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
-//        <#code#>
-//    }
-//}
-//
-//extension SearchViewController: ASCollectionDelegate {
-//
-//}
+extension SearchViewController: ASCollectionDataSource {
+    public func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
+        <#code#>
+    }
+}
+
+extension SearchViewController: ASCollectionDelegate {
+
+}
