@@ -9,6 +9,7 @@ target 'Onboarding Search Filter' do
   pod 'RxCocoa'
   pod 'RxSwift'
   pod 'RxDataSources'
+  pod "Texture"
 
 end
 
