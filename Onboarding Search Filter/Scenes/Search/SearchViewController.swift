@@ -21,6 +21,7 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     // MARK: CollectionNode setup
     private var collectionNode: ASCollectionNode = {
         let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.scrollDirection = .vertical
         
         let node = ASCollectionNode(collectionViewLayout: flowLayout)
         node.backgroundColor = #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
@@ -55,6 +56,9 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
         super.init(node: rootNode)
         
         self.title = "Search"
+        
+//        self.collectionNode.dataSource = self
+//        self.collectionNode.delegate = self
         
         rootNode.automaticallyManagesSubnodes = true
         
@@ -100,3 +104,13 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
         
     }
 }
+
+//extension SearchViewController: ASCollectionDataSource {
+//    public func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
+//        <#code#>
+//    }
+//}
+//
+//extension SearchViewController: ASCollectionDelegate {
+//
+//}

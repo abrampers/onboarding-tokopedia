@@ -3,10 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		219639FE22B9E148009A15EC /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 219639FD22B9E148009A15EC /* TestViewController.swift */; };
+		21963A0022BA1512009A15EC /* ShadowContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 219639FF22BA1512009A15EC /* ShadowContainerNode.swift */; };
+		21963A0222BA15BA009A15EC /* SearchCollectionCellNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21963A0122BA15BA009A15EC /* SearchCollectionCellNode.swift */; };
 		43D651C7156A1BC3E4BC81D3 /* Pods_Onboarding_Search_Filter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD8D358E027B4ADDFF42A31C /* Pods_Onboarding_Search_Filter.framework */; };
 		C010FF87216A3786002FF672 /* UIColor+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C010FF86216A3786002FF672 /* UIColor+Theme.swift */; };
 		C010FF89216A386E002FF672 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C010FF88216A386E002FF672 /* SearchViewModel.swift */; };
@@ -28,8 +31,6 @@
 		C0BADEB5216B358700B68B3B /* AceTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0BADEB4216B358700B68B3B /* AceTarget.swift */; };
 		C0BADEB7216B3AB900B68B3B /* ShopFilterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0BADEB6216B3AB900B68B3B /* ShopFilterViewModel.swift */; };
 		C0BADEB9216B615000B68B3B /* UIScrollView+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0BADEB8216B615000B68B3B /* UIScrollView+Rx.swift */; };
-		C0BADEBE216CB12700B68B3B /* SearchCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0BADEBC216CB12700B68B3B /* SearchCollectionViewCell.swift */; };
-		C0BADEBF216CB12700B68B3B /* SearchCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C0BADEBD216CB12700B68B3B /* SearchCollectionViewCell.xib */; };
 		C0E5C32D219C407800D05D11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0E5C32C219C407800D05D11 /* Assets.xcassets */; };
 		C0EDDF4B216A2A230025A000 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EDDF4A216A2A230025A000 /* AppDelegate.swift */; };
 		C0EDDF4D216A2A230025A000 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EDDF4C216A2A230025A000 /* ViewController.swift */; };
@@ -40,6 +41,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		219639FD22B9E148009A15EC /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
+		219639FF22BA1512009A15EC /* ShadowContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowContainerNode.swift; sourceTree = "<group>"; };
+		21963A0122BA15BA009A15EC /* SearchCollectionCellNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCollectionCellNode.swift; sourceTree = "<group>"; };
 		BD5B7B8983D5B3F1708CB188 /* Pods-Onboarding Search Filter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Onboarding Search Filter.release.xcconfig"; path = "Pods/Target Support Files/Pods-Onboarding Search Filter/Pods-Onboarding Search Filter.release.xcconfig"; sourceTree = "<group>"; };
 		C010FF86216A3786002FF672 /* UIColor+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Theme.swift"; sourceTree = "<group>"; };
 		C010FF88216A386E002FF672 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
@@ -61,8 +65,6 @@
 		C0BADEB4216B358700B68B3B /* AceTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AceTarget.swift; sourceTree = "<group>"; };
 		C0BADEB6216B3AB900B68B3B /* ShopFilterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopFilterViewModel.swift; sourceTree = "<group>"; };
 		C0BADEB8216B615000B68B3B /* UIScrollView+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScrollView+Rx.swift"; sourceTree = "<group>"; };
-		C0BADEBC216CB12700B68B3B /* SearchCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCollectionViewCell.swift; sourceTree = "<group>"; };
-		C0BADEBD216CB12700B68B3B /* SearchCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchCollectionViewCell.xib; sourceTree = "<group>"; };
 		C0E5C32C219C407800D05D11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C0EDDF47216A2A230025A000 /* Onboarding Search Filter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Onboarding Search Filter.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0EDDF4A216A2A230025A000 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			children = (
 				C0B0CE2E216A2F7200E806C8 /* Slider */,
 				C010FF86216A3786002FF672 /* UIColor+Theme.swift */,
+				219639FF22BA1512009A15EC /* ShadowContainerNode.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -117,9 +120,8 @@
 		C010FF90216A3AE0002FF672 /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				C0BADEBC216CB12700B68B3B /* SearchCollectionViewCell.swift */,
-				C0BADEBD216CB12700B68B3B /* SearchCollectionViewCell.xib */,
 				E529F27C2186F2F30008DFA9 /* SearchCellViewModel.swift */,
+				21963A0122BA15BA009A15EC /* SearchCollectionCellNode.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -259,6 +261,7 @@
 				C0EDDF4E216A2A230025A000 /* Main.storyboard */,
 				C0EDDF53216A2A250025A000 /* LaunchScreen.storyboard */,
 				C0EDDF56216A2A250025A000 /* Info.plist */,
+				219639FD22B9E148009A15EC /* TestViewController.swift */,
 			);
 			path = "Onboarding Search Filter";
 			sourceTree = "<group>";
@@ -331,7 +334,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0BADEBF216CB12700B68B3B /* SearchCollectionViewCell.xib in Resources */,
 				C0EDDF55216A2A250025A000 /* LaunchScreen.storyboard in Resources */,
 				C0B0CE2C216A2EC700E806C8 /* SearchViewController.xib in Resources */,
 				C0EDDF50216A2A230025A000 /* Main.storyboard in Resources */,
@@ -388,7 +390,8 @@
 			files = (
 				C010FF9B216A3F74002FF672 /* SearchResponse.swift in Sources */,
 				C0BADEB7216B3AB900B68B3B /* ShopFilterViewModel.swift in Sources */,
-				C0BADEBE216CB12700B68B3B /* SearchCollectionViewCell.swift in Sources */,
+				219639FE22B9E148009A15EC /* TestViewController.swift in Sources */,
+				21963A0022BA1512009A15EC /* ShadowContainerNode.swift in Sources */,
 				C0BADEB5216B358700B68B3B /* AceTarget.swift in Sources */,
 				C0B0CE32216A2F7200E806C8 /* ThumbLayer.swift in Sources */,
 				C0BADEA7216B2EDA00B68B3B /* FilterViewModel.swift in Sources */,
@@ -397,6 +400,7 @@
 				E529F27D2186F2F30008DFA9 /* SearchCellViewModel.swift in Sources */,
 				E57E54F4218966B3009B06F3 /* ShopTypes.swift in Sources */,
 				C0BADEB1216B32B100B68B3B /* SearchUseCase.swift in Sources */,
+				21963A0222BA15BA009A15EC /* SearchCollectionCellNode.swift in Sources */,
 				C0B0CE2B216A2EC700E806C8 /* SearchViewController.swift in Sources */,
 				C0BADEAC216B2F0700B68B3B /* ShopFilterViewController.swift in Sources */,
 				C0EDDF4D216A2A230025A000 /* ViewController.swift in Sources */,
