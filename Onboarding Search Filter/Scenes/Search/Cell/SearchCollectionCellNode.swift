@@ -47,10 +47,6 @@ internal class SearchCollectionCellNode: ASCellNode {
         output.price.drive(self.cellRootNode.searchCollectionPriceNode.rx.text(cellRootNode.priceAttributes)).disposed(by: disposeBag)
         output.url.drive(self.cellRootNode.searchCollectionImageNode.rx.url).disposed(by: disposeBag)
     }
-    
-//    func bind(product: Product) {
-//
-//    }
 }
 
 

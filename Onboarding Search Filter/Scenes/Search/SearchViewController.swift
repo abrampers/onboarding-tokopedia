@@ -21,8 +21,6 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     private var screenWidth: CGFloat?
     private var collectionNodeInset: CGFloat?
     
-    private let rootNode: ASDisplayNode
-    
     // MARK: CollectionNode setup
     private var collectionNode: ASCollectionNode = {
         let flowLayout = UICollectionViewFlowLayout()
@@ -58,11 +56,9 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     }()
     
     public init() {
-        rootNode = ASDisplayNode()
+        let rootNode = ASDisplayNode()
         rootNode.backgroundColor = .white
         super.init(node: rootNode)
-        
-        self.title = "Search"
         
         rootNode.automaticallyManagesSubnodes = true
         rootNode.automaticallyRelayoutOnSafeAreaChanges = true
@@ -104,6 +100,11 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
             self.collectionNodeInset = (self.screenWidth! - 350) / 4
             collectionNode.contentInset = UIEdgeInsets(top: 7, left: self.collectionNodeInset!, bottom: 7, right: self.collectionNodeInset!)
         }
+        
+        self.navigationController?.navigationItem.largeTitleDisplayMode = .automatic
+//        self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.title = "Search"
+        
         bindViewModel()
     }
     
@@ -149,8 +150,7 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
         output.openFilter
             .drive(onNext: { [weak self] (filter) in
                 let filterVC = FilterViewController(filterObject: filter)
-                let navigationController = UINavigationController(rootViewController: filterVC)
-                self?.navigationController?.present(navigationController, animated: true, completion: nil)
+                self?.navigationController?.present(filterVC, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
 
