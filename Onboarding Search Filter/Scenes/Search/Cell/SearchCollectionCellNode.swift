@@ -6,16 +6,26 @@
 //
 
 import AsyncDisplayKit
+import RxSwift
+import RxCocoa_Texture
 
-class SearchCollectionCellNode: ASCellNode {
-    private lazy var cellRootNode = SearchCollectionCellRootNode(image: UIImage(named: "tesla")!, title: "Tesla", price: 5000)
+internal class SearchCollectionCellNode: ASCellNode {
+    private var product: Product
+    private var cellRootNode: SearchCollectionCellRootNode
     
-    private lazy var shadowNode = ShadowContainerNode(rootNode: cellRootNode, cornerRadius: 8)//ShadowContainerNode(rootNode: cellRootNode, cornerRadius: 8)
+    private lazy var shadowNode = ShadowContainerNode(rootNode: cellRootNode, cornerRadius: 8)
     
-    override init() {
+    let disposeBag = DisposeBag()
+    
+    internal init(product: Product) {
+        self.product = product
+        self.cellRootNode = SearchCollectionCellRootNode(imageURLString: product.imageURLString, title: product.name ?? "Name not found", price: product.price ?? "Price not found")
         super.init()
         
+        self.style.width = ASDimensionMake(175)
+        
         self.automaticallyManagesSubnodes = true
+        self.neverShowPlaceholders = true
         
         cellRootNode.cornerRadius = 8
         cellRootNode.clipsToBounds = true
@@ -29,37 +39,48 @@ class SearchCollectionCellNode: ASCellNode {
     }
     
     private func bindViewModel() {
+        let viewModel = SearchCellViewModel(product: product)
         
+        let output = viewModel.transform(input: SearchCellViewModel.Input())
+        
+        output.title.drive(self.cellRootNode.searchCollectionTitleNode.rx.text(cellRootNode.titleAttributes)).disposed(by: disposeBag)
+        output.price.drive(self.cellRootNode.searchCollectionPriceNode.rx.text(cellRootNode.priceAttributes)).disposed(by: disposeBag)
+        output.url.drive(self.cellRootNode.searchCollectionImageNode.rx.url).disposed(by: disposeBag)
     }
     
-    func bind(product: Product) {
-
-    }
+//    func bind(product: Product) {
+//
+//    }
 }
 
 
 private class SearchCollectionCellRootNode: ASDisplayNode {
-    private let currencyFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale(identifier: "id_ID")
-        return formatter
-    }()
+    
+    fileprivate let titleAttributes: [NSAttributedString.Key: Any] = [
+        .font: UIFont.systemFont(ofSize: 15, weight: .medium),
+        .foregroundColor: #colorLiteral(red: 0.4392156863, green: 0.4392156863, blue: 0.4392156863, alpha: 1)
+    ]
+    
+    fileprivate let priceAttributes: [NSAttributedString.Key: Any] = [
+        .font: UIFont.systemFont(ofSize: 15, weight: .medium),
+        .foregroundColor: UIColor.tpOrange
+    ]
     
     // TODO: nanti diganti network image node kalo networking udah ada
-    private let searchCollectionImageNode: ASImageNode = {
-        let node = ASImageNode()
+    fileprivate let searchCollectionImageNode: ASNetworkImageNode = {
+        let node = ASNetworkImageNode()
         
-        node.style.preferredSize = CGSize(width: 150, height: 150)
+        node.style.preferredSize = CGSize(width: 175, height: 175)
         
         return node
     }()
     
-    private let searchCollectionTitleNode: ASTextNode = {
+    fileprivate let searchCollectionTitleNode: ASTextNode = {
         let node = ASTextNode()
         
         node.truncationMode = .byTruncatingTail
         node.truncationAttributedText = NSAttributedString(string: "...")
+        node.maximumNumberOfLines = 2
         
         return node
     }()
@@ -76,37 +97,33 @@ private class SearchCollectionCellRootNode: ASDisplayNode {
     //        return node
     //    }()
     
-    private let searchCollectionPriceNode = ASTextNode()
+    fileprivate let searchCollectionPriceNode = ASTextNode()
     
-    required init(image: UIImage, title: String, price: Int) {
+    required init(imageURLString: String?, title: String, price: String) {
         super.init()
         
         self.backgroundColor = .white
         
-        searchCollectionImageNode.image = image
+        searchCollectionImageNode.url = URL(string: imageURLString ?? "")
         searchCollectionTitleNode.attributedText = NSAttributedString(string: title,
-                                                                      attributes: [
-                                                                        .font: UIFont.systemFont(ofSize: 15, weight: .heavy),
-                                                                        .foregroundColor: #colorLiteral(red: 0.4392156863, green: 0.4392156863, blue: 0.4392156863, alpha: 1)])
-        searchCollectionPriceNode.attributedText = NSAttributedString(string: self.currencyFormatter.string(for: price) ?? "",
-                                                                      attributes: [
-                                                                        .font: UIFont.systemFont(ofSize: 15, weight: .medium),
-                                                                        .foregroundColor: #colorLiteral(red: 0.9333333333, green: 0.4470588235, blue: 0.2901960784, alpha: 1)])
+                                                                      attributes: self.titleAttributes)
+        searchCollectionPriceNode.attributedText = NSAttributedString(string: price,
+                                                                      attributes: self.priceAttributes)
         
         self.automaticallyManagesSubnodes = true
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let bottomVStackSpec = ASStackLayoutSpec(direction: .vertical,
-                                                 spacing: 0,
+                                                 spacing: 2,
                                                  justifyContent: .start,
                                                  alignItems: .start,
                                                  children: [searchCollectionTitleNode, searchCollectionPriceNode])
         
-        let insetBottomSpec = ASInsetLayoutSpec(insets: UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6), child: bottomVStackSpec)
+        let insetBottomSpec = ASInsetLayoutSpec(insets: UIEdgeInsets(top: 2, left: 6, bottom: 6, right: 6), child: bottomVStackSpec)
         
         let vStackSpec = ASStackLayoutSpec(direction: .vertical,
-                                           spacing: 6,
+                                           spacing: 2,
                                            justifyContent: .start,
                                            alignItems: .start,
                                            children: [searchCollectionImageNode, insetBottomSpec])

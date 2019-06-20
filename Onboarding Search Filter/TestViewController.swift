@@ -9,7 +9,7 @@ import AsyncDisplayKit
 
 class TestViewController: ASViewController<ASDisplayNode> {
     
-    let customNode = SearchCollectionCellNode()
+    let customNode = SearchCollectionCellNode(product: Product(id: 1, name: "asdf", price: "asdf", imageURLString: "https://github.com/RxSwiftCommunity/RxCocoa-Texture/raw/master/resources/logo.png"))
     
     init() {
         super.init(node: ASDisplayNode())

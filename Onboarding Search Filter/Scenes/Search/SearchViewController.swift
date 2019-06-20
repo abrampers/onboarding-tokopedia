@@ -9,6 +9,8 @@ import AsyncDisplayKit
 import RxCocoa
 import RxDataSources
 import RxSwift
+import RxCocoa_Texture
+import RxASDataSources
 
 // MARK: SearchViewController
 public class SearchViewController: ASViewController<ASDisplayNode> {
@@ -16,7 +18,10 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     private let disposeBag = DisposeBag()
     private var viewModel: SearchViewModel = SearchViewModel(filter: Filter(), useCase: DefaultSearchUseCase())
     
-    private var screenWidth: CGFloat!
+    private var screenWidth: CGFloat?
+    private var collectionNodeInset: CGFloat?
+    
+    private let rootNode: ASDisplayNode
     
     // MARK: CollectionNode setup
     private var collectionNode: ASCollectionNode = {
@@ -24,8 +29,10 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
         flowLayout.scrollDirection = .vertical
         
         let node = ASCollectionNode(collectionViewLayout: flowLayout)
-        node.backgroundColor = #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
+        node.backgroundColor = .white
         node.style.flexGrow = 1
+        node.contentInset = UIEdgeInsets(top: 7, left: 7, bottom: 7, right: 7)
+        node.showsVerticalScrollIndicator = false
         
         return node
     }()
@@ -33,14 +40,14 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     // MARK: ButtonNode setup
     private var buttonNode: ASButtonNode = {
         let node = ASButtonNode()
-        node.backgroundColor = #colorLiteral(red: 0, green: 0.8308004737, blue: 0.5435867906, alpha: 1)
+        node.backgroundColor = UIColor.tpGreen
         node.setAttributedTitle(NSAttributedString(string: "Filter", attributes: [
             .foregroundColor: UIColor.white,
             .font: UIFont.systemFont(ofSize: 14)
             ]), for: .normal)
         
         node.style.width = ASDimensionMake("100%")
-        node.style.height = ASDimensionMake(50)
+        node.style.height = ASDimensionMake(40)
         
         var cornerRadius: CGFloat = 8.0
         // Use precomposition for rounding corners
@@ -51,18 +58,15 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     }()
     
     public init() {
-        let rootNode = ASDisplayNode()
+        rootNode = ASDisplayNode()
         rootNode.backgroundColor = .white
         super.init(node: rootNode)
         
         self.title = "Search"
         
-//        self.collectionNode.dataSource = self
-//        self.collectionNode.delegate = self
-        
         rootNode.automaticallyManagesSubnodes = true
+        rootNode.automaticallyRelayoutOnSafeAreaChanges = true
         
-        // TODO: Harus pake weak apa engga?
         rootNode.layoutSpecBlock = { [weak self] _, _ -> ASLayoutSpec in
             guard let self = self else { return ASLayoutSpec() }
             let buttonInsetSpec = ASInsetLayoutSpec(insets: UIEdgeInsets(top: 4,
@@ -76,7 +80,11 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
                                               alignItems: .center,
                                               children: [self.collectionNode, buttonInsetSpec])
             
-            return stackSpec
+            return ASInsetLayoutSpec(insets: UIEdgeInsets(top: self.node.safeAreaInsets.top,
+                                                          left: self.node.safeAreaInsets.left,
+                                                          bottom: self.node.safeAreaInsets.bottom,
+                                                          right: self.node.safeAreaInsets.right),
+                                     child: stackSpec)
         }
     }
     
@@ -88,7 +96,14 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        self.screenWidth = UIScreen.main.bounds.size.width
+        if self.screenWidth == nil {
+            self.screenWidth = UIScreen.main.bounds.size.width
+        }
+        
+        if self.collectionNodeInset == nil {
+            self.collectionNodeInset = (self.screenWidth! - 350) / 4
+            collectionNode.contentInset = UIEdgeInsets(top: 7, left: self.collectionNodeInset!, bottom: 7, right: self.collectionNodeInset!)
+        }
         bindViewModel()
     }
     
@@ -101,16 +116,44 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     }
 
     private func bindViewModel() {
+        let loadMoreTrigger = collectionNode.rxReachBottom.asDriver { error -> Driver<Void> in
+            return .empty()
+        }
         
+        let newFilterTrigger = Driver<Filter>.empty()
+        
+        let input = SearchViewModel.Input(viewDidLoadTrigger: Driver.just(()),
+                                          loadMoreTrigger: loadMoreTrigger,
+                                          filterButtonTapTrigger: buttonNode.rx.tap.asDriver(onErrorRecover: { (_) -> Driver<Void> in
+                                            return .empty()
+                                          }),
+                                          newFilterTrigger: newFilterTrigger)
+        
+        let output = self.viewModel.transform(input: input)
+
+        let configureCellBlock: RxASCollectionReloadDataSource<SectionOfProducts>.ConfigureCellBlock = { (dataSource, collectionNode, indexPath, product) -> ASCellNodeBlock in
+            let cell = SearchCollectionCellNode(product: product)
+            return {
+                return cell
+            }
+        }
+        let dataSource = RxASCollectionReloadDataSource<SectionOfProducts>(configureCellBlock: configureCellBlock, configureSupplementaryView: nil)
+        
+        output.searchList
+            .map({ (products) -> [SectionOfProducts] in
+                return [SectionOfProducts(items: products)]
+            })
+            .drive(collectionNode.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        output.openFilter
+            .drive(onNext: { [weak self] (filter) in
+                let filterVC = FilterViewController(filterObject: filter)
+                let navigationController = UINavigationController(rootViewController: filterVC)
+                self?.navigationController?.present(navigationController, animated: true, completion: nil)
+            })
+            .disposed(by: disposeBag)
+
     }
 }
 
-extension SearchViewController: ASCollectionDataSource {
-    public func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
-        <#code#>
-    }
-}
-
-extension SearchViewController: ASCollectionDelegate {
-
-}

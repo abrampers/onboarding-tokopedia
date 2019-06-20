@@ -8,6 +8,7 @@
 import Foundation
 
 public struct Product: Decodable {
+    
     internal let id: Int?
     internal let name: String?
     internal let price: String?
