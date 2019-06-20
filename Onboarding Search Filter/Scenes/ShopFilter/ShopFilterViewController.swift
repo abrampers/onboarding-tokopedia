@@ -25,7 +25,23 @@ class ShopFilterViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        setupNavBar()
         bindViewModel()
+    }
+    
+    private func setupNavBar() {
+        title = "Filter"
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: nil, action: nil)
+        self.navigationItem.rightBarButtonItem?.tintColor = .tpGreen
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .stop, target: nil, action: nil)
+        self.navigationItem.leftBarButtonItem?.tintColor = .n500
+        
+        self.navigationItem.leftBarButtonItem?.rx.tap.asObservable()
+            .subscribe(onNext: { (_) in
+                self.navigationController?.dismiss(animated: true, completion: nil)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func bindViewModel() {

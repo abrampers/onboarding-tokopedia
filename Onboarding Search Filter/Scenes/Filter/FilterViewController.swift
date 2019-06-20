@@ -16,12 +16,12 @@ class FilterViewController: ASViewController<ASDisplayNode> {
     
     private static let priceLabelAttributes: [NSAttributedString.Key: Any] = [
         .foregroundColor: UIColor.n200,
-        .font: UIFont.systemFont(ofSize: 16, weight: .medium)
+        .font: UIFont.systemFont(ofSize: 16, weight: .regular)
     ]
     
     private static let priceAttributes: [NSAttributedString.Key: Any] = [
         .foregroundColor: UIColor.n500,
-        .font: UIFont.systemFont(ofSize: 22, weight: .medium)
+        .font: UIFont.systemFont(ofSize: 22, weight: .regular)
     ]
     
     private let minimumPriceLabelNode: ASTextNode = {
@@ -80,15 +80,34 @@ class FilterViewController: ASViewController<ASDisplayNode> {
         return node
     }()
     
+    private let shopTypeLabelNode: ASTextNode = {
+        let node = ASTextNode()
+        
+        node.attributedText = NSAttributedString(string: "Shop Type", attributes: FilterViewController.priceAttributes)
+        
+        return node
+    }()
+    
+    private let shopRightArrowNode: ASImageNode = {
+        let node = ASImageNode()
+        
+        node.image = UIImage(named: "next")
+        
+        return node
+    }()
+    
     private let secondNode: ASDisplayNode =  {
         let node = ASDisplayNode()
         
         node.backgroundColor = .white
         node.style.width = ASDimensionMake("100%")
-        node.style.height = ASDimensionMake(300)
         
         return node
     }()
+    
+    private let buttonNode = ButtonNode(named: "Apply")
+    private let goldMerchantNode = ShopTypeNode(title: "Gold Merchant")
+    private let officialStoreNode = ShopTypeNode(title: "Official Store")
     
     public init(filterObject: Filter) {
         viewModel = FilterViewModel(filter: filterObject)
@@ -97,12 +116,6 @@ class FilterViewController: ASViewController<ASDisplayNode> {
         rootNode.backgroundColor = .n50
         
         super.init(node: rootNode)
-        
-        self.modalPresentationStyle = .pageSheet
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: nil, action: nil)
-        self.navigationItem.rightBarButtonItem?.tintColor = .tpGreen
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .stop, target: nil, action: nil)
-        self.navigationItem.leftBarButtonItem?.tintColor = .n500
         
         rootNode.automaticallyManagesSubnodes = true
         rootNode.automaticallyRelayoutOnSafeAreaChanges = true
@@ -165,20 +178,44 @@ class FilterViewController: ASViewController<ASDisplayNode> {
             return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16), child: stack)
         }
         
+        secondNode.automaticallyManagesSubnodes = true
+        
         // MARK: Lower layout spec
         secondNode.layoutSpecBlock = { [weak self] _, _ -> ASLayoutSpec in
             guard let self = self else { return ASLayoutSpec() }
             
-            return ASLayoutSpec()
+            let upperStack = ASStackLayoutSpec(direction: .horizontal,
+                                          spacing: 10,
+                                          justifyContent: .spaceBetween,
+                                          alignItems: .center,
+                                          children: [self.shopTypeLabelNode, self.shopRightArrowNode])
+            
+            let lowerStack = ASStackLayoutSpec(direction: .horizontal,
+                                               spacing: 12,
+                                               justifyContent: .start,
+                                               alignItems: .center,
+                                               children: [self.goldMerchantNode, self.officialStoreNode])
+            
+            let stack = ASStackLayoutSpec(direction: .vertical, spacing: 16, justifyContent: .start, alignItems: .stretch, children: [upperStack, lowerStack])
+            
+            return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16), child: stack)
         }
         
         rootNode.layoutSpecBlock = { [weak self] _, _ -> ASLayoutSpec in
             guard let self = self else { return ASLayoutSpec() }
-            let outerStack = ASStackLayoutSpec(direction: .vertical,
+            let innerStack = ASStackLayoutSpec(direction: .vertical,
                                      spacing: 10,
                                      justifyContent: .start,
                                      alignItems: .center,
                                      children: [self.firstNode, self.secondNode])
+            
+            let buttonInsetSpec = ASInsetLayoutSpec(insets: UIEdgeInsets(top: 8, left: 8, bottom: 0, right: 8), child: self.buttonNode)
+            
+            let outerStack = ASStackLayoutSpec(direction: .vertical,
+                                               spacing: 16,
+                                               justifyContent: .spaceBetween,
+                                               alignItems: .stretch,
+                                               children: [innerStack, buttonInsetSpec])
             
             return ASInsetLayoutSpec(insets: UIEdgeInsets(top: self.node.safeAreaInsets.top + 10,
                                                           left: self.node.safeAreaInsets.left,
@@ -206,6 +243,16 @@ class FilterViewController: ASViewController<ASDisplayNode> {
     
     private func setupNavBar() {
         title = "Filter"
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: nil, action: nil)
+        self.navigationItem.rightBarButtonItem?.tintColor = .tpGreen
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .stop, target: nil, action: nil)
+        self.navigationItem.leftBarButtonItem?.tintColor = .n500
+        
+        self.navigationItem.leftBarButtonItem?.rx.tap.asObservable()
+            .subscribe(onNext: { (_) in
+                self.navigationController?.dismiss(animated: true, completion: nil)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func bindViewModel() {

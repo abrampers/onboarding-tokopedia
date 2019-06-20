@@ -8,4 +8,6 @@
 import Foundation
 
 struct ShopTypes {
+    var goldMerchant: Bool
+    var officialStore: Bool
 }

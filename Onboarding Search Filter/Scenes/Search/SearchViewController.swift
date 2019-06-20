@@ -36,24 +36,7 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     }()
     
     // MARK: ButtonNode setup
-    private var buttonNode: ASButtonNode = {
-        let node = ASButtonNode()
-        node.backgroundColor = UIColor.tpGreen
-        node.setAttributedTitle(NSAttributedString(string: "Filter", attributes: [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.systemFont(ofSize: 14)
-            ]), for: .normal)
-        
-        node.style.width = ASDimensionMake("100%")
-        node.style.height = ASDimensionMake(40)
-        
-        var cornerRadius: CGFloat = 8.0
-        // Use precomposition for rounding corners
-        node.cornerRoundingType = ASCornerRoundingType.defaultSlowCALayer // kenapa gabisa pake .clipping or .precomposited
-        node.cornerRadius = cornerRadius
-        
-        return node
-    }()
+    private var buttonNode: ASButtonNode = ButtonNode(named: "Filter")
     
     public init() {
         let rootNode = ASDisplayNode()
@@ -101,8 +84,10 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
             collectionNode.contentInset = UIEdgeInsets(top: 7, left: self.collectionNodeInset!, bottom: 7, right: self.collectionNodeInset!)
         }
         
-        self.navigationController?.navigationItem.largeTitleDisplayMode = .automatic
-//        self.navigationController?.navigationBar.prefersLargeTitles = true
+        if UIScreen.main.bounds.size.height > 667 {
+            self.navigationController?.navigationBar.prefersLargeTitles = true
+        }
+    
         self.title = "Search"
         
         bindViewModel()
@@ -150,7 +135,9 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
         output.openFilter
             .drive(onNext: { [weak self] (filter) in
                 let filterVC = FilterViewController(filterObject: filter)
-                self?.navigationController?.present(filterVC, animated: true, completion: nil)
+                let navCon = UINavigationController(rootViewController: filterVC)
+                navCon.modalPresentationStyle = .pageSheet
+                self?.navigationController?.present(navCon, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
 
