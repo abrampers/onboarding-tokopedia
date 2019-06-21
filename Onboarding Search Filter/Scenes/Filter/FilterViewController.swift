@@ -9,10 +9,16 @@ import AsyncDisplayKit
 import RxCocoa
 import RxSwift
 
+protocol FilterDelegate {
+    func recvFilter(filter: Filter)
+}
+
 class FilterViewController: ASViewController<ASDisplayNode> {
     
     private let disposeBag = DisposeBag()
     private var viewModel: FilterViewModel
+    
+    public var delegate: FilterDelegate?
     
     private static let priceLabelAttributes: [NSAttributedString.Key: Any] = [
         .foregroundColor: UIColor.n200,
@@ -201,6 +207,12 @@ class FilterViewController: ASViewController<ASDisplayNode> {
             return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16), child: stack)
         }
         
+        buttonNode.rx.tap.asObservable().subscribe(onNext: { [weak self] (_) in
+            // TODO: Get data from this viewcontroller
+            self?.delegate?.recvFilter(filter: Filter(q: "Apple", pmin: 800000, pmax: 50000, wholesale: false, official: false, fshop: 0, rows: 10))
+            self?.navigationController?.dismiss(animated: true, completion: nil)
+        }).disposed(by: disposeBag)
+        
         rootNode.layoutSpecBlock = { [weak self] _, _ -> ASLayoutSpec in
             guard let self = self else { return ASLayoutSpec() }
             let innerStack = ASStackLayoutSpec(direction: .vertical,
@@ -243,14 +255,14 @@ class FilterViewController: ASViewController<ASDisplayNode> {
     
     private func setupNavBar() {
         title = "Filter"
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: nil, action: nil)
-        self.navigationItem.rightBarButtonItem?.tintColor = .tpGreen
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .stop, target: nil, action: nil)
-        self.navigationItem.leftBarButtonItem?.tintColor = .n500
-        
-        self.navigationItem.leftBarButtonItem?.rx.tap.asObservable()
-            .subscribe(onNext: { (_) in
-                self.navigationController?.dismiss(animated: true, completion: nil)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: nil, action: nil)
+        navigationItem.rightBarButtonItem?.tintColor = .tpGreen
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .stop, target: nil, action: nil)
+        navigationItem.leftBarButtonItem?.tintColor = .n500
+    
+        navigationItem.leftBarButtonItem?.rx.tap.asObservable()
+            .subscribe(onNext: { [weak self] (_) in
+                self?.navigationController?.dismiss(animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
     }

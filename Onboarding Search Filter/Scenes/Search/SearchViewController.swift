@@ -18,6 +18,8 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     private let disposeBag = DisposeBag()
     private var viewModel: SearchViewModel = SearchViewModel(filter: Filter(), useCase: DefaultSearchUseCase())
     
+    private var filterVC: FilterViewController!
+    
     private var screenWidth: CGFloat?
     private var collectionNodeInset: CGFloat?
     
@@ -75,20 +77,19 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        if self.screenWidth == nil {
-            self.screenWidth = UIScreen.main.bounds.size.width
+        title = "Search"
+        if screenWidth == nil {
+            screenWidth = UIScreen.main.bounds.size.width
         }
         
-        if self.collectionNodeInset == nil {
-            self.collectionNodeInset = (self.screenWidth! - 350) / 4
+        if collectionNodeInset == nil {
+            collectionNodeInset = (self.screenWidth! - 350) / 4
             collectionNode.contentInset = UIEdgeInsets(top: 7, left: self.collectionNodeInset!, bottom: 7, right: self.collectionNodeInset!)
         }
         
         if UIScreen.main.bounds.size.height > 667 {
-            self.navigationController?.navigationBar.prefersLargeTitles = true
+            navigationController?.navigationBar.prefersLargeTitles = true
         }
-    
-        self.title = "Search"
         
         bindViewModel()
     }
@@ -100,13 +101,18 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
     private func setupUI() {
         
     }
+    
+    private var newFilterTrigger = Driver<Filter>.empty()
 
     private func bindViewModel() {
         let loadMoreTrigger = collectionNode.rxReachBottom.asDriver { error -> Driver<Void> in
             return .empty()
         }
         
-        let newFilterTrigger = Driver<Filter>.empty()
+        let newFilterTrigger = PublishSubject<Filter>()
+//        let newFilterTrigger = navigationController?.rx.deallocating.asDriver(onErrorRecover: { (_) -> Driver<Void> in
+//            return .empty()
+//        })
         
         let input = SearchViewModel.Input(viewDidLoadTrigger: Driver.just(()),
                                           loadMoreTrigger: loadMoreTrigger,
@@ -115,7 +121,7 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
                                           }),
                                           newFilterTrigger: newFilterTrigger)
         
-        let output = self.viewModel.transform(input: input)
+        let output = viewModel.transform(input: input)
 
         let configureCellBlock: RxASCollectionReloadDataSource<SectionOfProducts>.ConfigureCellBlock = { (dataSource, collectionNode, indexPath, product) -> ASCellNodeBlock in
             let cell = SearchCollectionCellNode(product: product)
@@ -134,13 +140,28 @@ public class SearchViewController: ASViewController<ASDisplayNode> {
         
         output.openFilter
             .drive(onNext: { [weak self] (filter) in
-                let filterVC = FilterViewController(filterObject: filter)
-                let navCon = UINavigationController(rootViewController: filterVC)
+                guard let self = self else { return }
+                self.filterVC = FilterViewController(filterObject: filter)
+                let navCon = UINavigationController(rootViewController: self.filterVC)
                 navCon.modalPresentationStyle = .pageSheet
-                self?.navigationController?.present(navCon, animated: true, completion: nil)
+                self.navigationController?.present(navCon, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
 
     }
 }
 
+//class UseCase {
+//    func getFilter(from viewController: UIViewController) -> Driver<Filter> {
+//        let filter = FilterVC()
+//        viewController.present(filter)
+//        
+//        return Observable.create { observer in
+//            filter.onSelected = { filterData
+//                obbserver.onNext(filterData)
+//            }
+//        }
+//    }
+//    
+//    
+//}

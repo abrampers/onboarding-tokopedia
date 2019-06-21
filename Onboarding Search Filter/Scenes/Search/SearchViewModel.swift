@@ -12,7 +12,7 @@ import RxSwift
 
 public final class SearchViewModel: NSObject, ViewModelType {
     
-    private let filter: Filter
+    private var filter: Filter
     private let useCase: SearchUseCase
 
     init(filter: Filter, useCase: SearchUseCase) {
@@ -24,7 +24,7 @@ public final class SearchViewModel: NSObject, ViewModelType {
         let viewDidLoadTrigger: Driver<Void>
         let loadMoreTrigger: Driver<Void>
         let filterButtonTapTrigger: Driver<Void>
-        let newFilterTrigger: Driver<Filter>
+        let newFilterTrigger: PublishSubject<Filter>
     }
     
     public struct Output {
@@ -32,19 +32,27 @@ public final class SearchViewModel: NSObject, ViewModelType {
         let openFilter: Driver<Filter>
     }
     
+    private var newFilterTrigger: PublishSubject<Filter>?
+    
     public func transform(input: Input) -> Output {
         let currentProducts = BehaviorRelay(value: [Product]())
         var startPage = 0
         
-        let newFilterTrigger = input.newFilterTrigger
+        newFilterTrigger = input.newFilterTrigger
+            
+        let currNewFilterTrigger = newFilterTrigger?.asDriver(onErrorRecover: { (_) -> SharedSequence<DriverSharingStrategy, Filter> in
+            return .empty()
+        })
             .map({ _ in })
             .do(onNext: { _ in
                 currentProducts.accept([Product]())
                 startPage = 0
-            })
+            }) ?? Driver<Void>.empty()
         
-        let filterDriver = input.newFilterTrigger.startWith(self.filter)
-        let refreshDataTrigger = Driver.merge(input.loadMoreTrigger, input.viewDidLoadTrigger, newFilterTrigger)
+        let filterDriver = input.newFilterTrigger.startWith(self.filter).asDriver { (_) -> SharedSequence<DriverSharingStrategy, Filter> in
+            return .empty()
+        }
+        let refreshDataTrigger = Driver.merge(input.loadMoreTrigger, input.viewDidLoadTrigger, currNewFilterTrigger)
         
         let response = refreshDataTrigger
             .withLatestFrom(filterDriver)
@@ -75,3 +83,41 @@ public final class SearchViewModel: NSObject, ViewModelType {
     }
 
 }
+
+extension SearchViewModel: FilterDelegate {
+    func recvFilter(filter: Filter) {
+        self.filter = filter
+        newFilterTrigger?.onNext(filter)
+    }
+}
+
+//class FilterVC {
+//    var filterResult: Driver<Filter>
+//    
+//    func viewDidLoad() {
+//        button.rx.tap.map {
+//            // ....
+//            return filterData
+//        }
+//    }
+//}
+//
+//let vc = FilterVC()
+//
+//vc.filterResult.drive(onNext: {
+//    
+//})
+//
+//vc.onFilterSelected = { filter in
+//    
+//}
+//
+//func bindVIewModel() {
+//    
+//    let filterData = button.rx.tap.map {
+//        let vc = FilterVC()
+//        return vc.filterData
+//    }
+//    
+//    let input = Input(filter: filterData)
+//}

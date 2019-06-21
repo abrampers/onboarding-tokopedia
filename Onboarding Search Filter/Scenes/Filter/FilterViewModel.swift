@@ -22,6 +22,7 @@ import RxSwift
     }
     
     public struct Output {
+//        let applyButtonTapTrigger: Driver<Void>
     }
     
     public func transform(input: Input) -> Output {
